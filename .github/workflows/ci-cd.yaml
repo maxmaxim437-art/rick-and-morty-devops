@@ -39,7 +39,7 @@ jobs:
         uses: helm/kind-action@v1.15.1
 
       - name: Load Docker Image into Kind
-        run: kind load docker-image rick-and-morty-api:ci
+        run: kind load docker-image rick-and-morty-api:ci --name chart-testing
 
       - name: Setup Helm
         uses: azure/setup-helm@v4

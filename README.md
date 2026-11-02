@@ -18,6 +18,21 @@ This project demonstrates an end-to-end DevOps workflow, from data collection an
    - `GET /characters` – Returns the filtered characters as JSON.
    - `GET /healthcheck` – Returns the application health status.
 
+## Future Application Enhancements
+
+The application can be extended to support additional functionality and more flexible data retrieval.
+
+Potential improvements include:
+
+- **Dynamic Filtering** – Allow users to filter characters by species, status, origin, gender, or location.
+- **Search Parameters** – Support query parameters such as `?species=Human&status=Alive`.
+- **Additional Endpoints** – Add endpoints for searching individual characters, locations, and episodes.
+- **Pagination** – Allow clients to retrieve results in smaller pages.
+- **Data Refresh** – Automate data collection and refresh the CSV or database periodically.
+- **Database Integration** – Replace CSV storage with PostgreSQL for more scalable data management.
+
+These enhancements would introduce application code changes, new dependencies, API behavior changes, and potentially infrastructure configuration updates.
+
 ## Containerization – Docker
 
 The application is packaged into a Docker image using a custom Dockerfile.
@@ -35,7 +50,7 @@ The Helm chart includes:
 
 - **Deployment** – Manages the application Pods and ensures the desired number of replicas.
 - **Service** – Exposes the Pods internally using a stable ClusterIP endpoint.
-- **Ingress** – Defines external HTTP routing to the application.
+- **Ingress** – Defines HTTP routing to the application.
 - **Values.yaml** – Centralizes deployment configuration, making it easier to customize the deployment.
 
 Helm is used to install and manage the Kubernetes resources as a single release.
@@ -56,6 +71,35 @@ Pipeline stages:
 8. Test the API endpoints using `curl`.
 
 The pipeline validates both the application and its Kubernetes deployment.
+
+### Why Does This Project Need CI/CD?
+
+CI/CD becomes increasingly important as the application evolves and new features are introduced.
+
+For example, future changes may include:
+
+- Adding new search parameters to the API.
+- Changing the character filtering logic.
+- Introducing new REST API endpoints.
+- Updating Python dependencies.
+- Modifying the Dockerfile or base image.
+- Changing Kubernetes resources or Helm configuration.
+- Integrating a database instead of CSV storage.
+
+Without CI/CD, these changes would require repeated manual testing and deployment. A developer could introduce a bug, break an existing endpoint, or deploy an incorrectly configured application without noticing.
+
+The automated pipeline helps prevent these issues by validating every relevant code change before it is considered ready.
+
+**CI/CD provides the following benefits:**
+
+- **Automated Testing** – Ensures that new features do not break existing functionality.
+- **Build Validation** – Verifies that the Docker image can be built successfully.
+- **Deployment Validation** – Checks that Kubernetes resources can be deployed correctly.
+- **API Validation** – Tests that the application endpoints respond as expected.
+- **Faster Development** – Allows developers to introduce changes with greater confidence.
+- **Reduced Human Errors** – Minimizes manual steps during testing and deployment.
+
+As the project grows, CI/CD provides a repeatable and reliable process for delivering new application versions.
 
 ## Project Structure
 
@@ -78,7 +122,9 @@ The pipeline validates both the application and its Kubernetes deployment.
 ├── characters.csv
 ├── Dockerfile
 ├── requirements.txt
-└── requirements-dev.txt
+├── requirements-dev.txt
+├── .gitignore
+└── .dockerignore
 ```
 
 ## Run Locally

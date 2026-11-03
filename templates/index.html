@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rick Morty DevOps</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <header class="header">
+
+        <div class="header-content">
+
+            <h1>RICK & MORTY</h1>
+
+            <h2>DEVOPS EXPLORER</h2>
+
+            <p class="subtitle">
+                Explore the universe, one character at a time.
+            </p>
+
+            <div class="author">
+                BY: MAXIM GONIK
+            </div>
+
+            <div class="server-status">
+                <span id="status-indicator" class="status-dot"></span>
+                <span id="status-text">Checking server...</span>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <main class="container">
+
+        <section class="filters">
+
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Search characters..."
+            >
+
+            <select id="location-filter">
+                <option value="">All Locations</option>
+            </select>
+
+        </section>
+
+
+        <section class="results-info">
+
+            <h2>Characters</h2>
+
+            <p id="results-count">
+                Loading characters...
+            </p>
+
+        </section>
+
+
+        <section
+            id="characters-container"
+            class="characters-grid">
+        </section>
+
+    </main>
+
+
+    <footer class="footer">
+        <p>Rick & Morty DevOps Project</p>
+        <p>Developed by Maxim Gonik</p>
+    </footer>
+
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>

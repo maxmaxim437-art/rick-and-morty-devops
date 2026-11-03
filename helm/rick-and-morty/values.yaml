@@ -14,3 +14,21 @@ ingress:
   enabled: true
   className: nginx
   host: rickmorty.local
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+
+probes:
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+  liveness:
+    initialDelaySeconds: 15
+    periodSeconds: 20

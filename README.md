@@ -1,148 +1,387 @@
-# Rick and Morty DevOps Project
+# Rick and Morty – DevOps Project
 
-## Project Overview
+A containerized Rick and Morty application deployed on Kubernetes using Docker and Helm, with automated testing and deployment validation through GitHub Actions.
 
-A containerized Flask REST API that collects character data from the [Rick and Morty API](https://rickandmortyapi.com/), filters the results, and exposes them through HTTP endpoints.
+## Overview
 
-This project demonstrates an end-to-end DevOps workflow, from data collection and application development to containerization, Kubernetes deployment, and automated CI/CD.
+This project retrieves character data from the [Rick and Morty API](https://rickandmortyapi.com/), filters the characters according to specific criteria, stores the results in a CSV file, and exposes the data through a Flask web application.
 
-## Application Flow
+The application includes a web interface for browsing characters, searching and filtering results, and checking application health.
 
-1. **Data Collection** – `main.py` retrieves character data from the Rick and Morty API, including all available pages.
-2. **Data Filtering** – Keeps only characters matching the following criteria:
-   - Species: Human
-   - Status: Alive
-   - Origin: Earth
-3. **CSV Generation** – Saves the filtered results to `characters.csv`, including character name, current location, and image.
-4. **Flask REST API** – `app.py` reads the CSV and exposes:
-   - `GET /characters` – Returns the filtered characters as JSON.
-   - `GET /healthcheck` – Returns the application health status.
+The project demonstrates an end-to-end DevOps workflow, from data collection and application development to containerization, Kubernetes deployment, and CI/CD automation.
 
-## Future Application Enhancements
+## Architecture
 
-The application can be extended to support additional functionality and more flexible data retrieval.
+```text
+Rick and Morty API
+        |
+        v
+  Python Data Fetcher
+        |
+        v
+  characters.csv
+        |
+        v
+   Flask Application
+        |
+        v
+    Docker Image
+        |
+        v
+    Kubernetes
+        |
+        +------ Deployment
+        |
+        +------ Service
+        |
+        +------ Ingress
+        |
+        v
+    Web Application
+```
 
-Potential improvements include:
+### CI/CD Workflow
 
-- **Dynamic Filtering** – Allow users to filter characters by species, status, origin, gender, or location.
-- **Search Parameters** – Support query parameters such as `?species=Human&status=Alive`.
-- **Additional Endpoints** – Add endpoints for searching individual characters, locations, and episodes.
-- **Pagination** – Allow clients to retrieve results in smaller pages.
-- **Data Refresh** – Automate data collection and refresh the CSV or database periodically.
-- **Database Integration** – Replace CSV storage with PostgreSQL for more scalable data management.
+GitHub Actions automatically validates the project:
 
-These enhancements would introduce application code changes, new dependencies, API behavior changes, and potentially infrastructure configuration updates.
+```text
+GitHub Push / Pull Request
+          |
+          v
+    Checkout Code
+          |
+          v
+    Setup Python
+          |
+          v
+ Install Dependencies
+          |
+          v
+      Run Tests
+          |
+          v
+   Build Docker Image
+          |
+          v
+   Create Kind Cluster
+          |
+          v
+     Deploy with Helm
+          |
+          v
+    Verify Deployment
+          |
+          v
+   Test Application API
+```
 
-## Containerization – Docker
+## Technologies
 
-The application is packaged into a Docker image using a custom Dockerfile.
+| Technology | Purpose |
+|---|---|
+| Python | Data collection and backend |
+| Flask | Web application and REST API |
+| Docker | Application containerization |
+| Kubernetes | Container orchestration |
+| Minikube | Local Kubernetes environment |
+| Helm | Kubernetes package management |
+| NGINX Ingress | HTTP routing |
+| GitHub Actions | CI/CD automation |
+| Kind | Kubernetes testing in CI |
+| Pytest | Automated testing |
 
-- Uses Python 3.12 Slim as the base image.
-- Installs application dependencies.
-- Copies the Flask application and generated CSV file.
-- Exposes port `5001`.
+## Application Features
 
-## Kubernetes & Helm
+- Fetches character data from the Rick and Morty API.
+- Filters characters by:
+  - Species: Human
+  - Status: Alive
+  - Origin: Earth
+- Exports character data to `characters.csv`.
+- Provides a Flask web application.
+- Displays character information and images.
+- Supports searching and filtering through the interface.
+- Provides application health monitoring.
 
-The application is deployed and managed on Kubernetes using Helm.
+### API Endpoints
 
-The Helm chart includes:
-
-- **Deployment** – Manages the application Pods and ensures the desired number of replicas.
-- **Service** – Exposes the Pods internally using a stable ClusterIP endpoint.
-- **Ingress** – Defines HTTP routing to the application.
-- **Values.yaml** – Centralizes deployment configuration, making it easier to customize the deployment.
-
-Helm is used to install and manage the Kubernetes resources as a single release.
-
-## CI/CD – GitHub Actions
-
-An automated pipeline runs on pushes and pull requests targeting the `main` branch.
-
-Pipeline stages:
-
-1. Install Python dependencies.
-2. Run automated tests using Pytest.
-3. Build the Docker image.
-4. Create a temporary Kubernetes cluster using Kind.
-5. Load the Docker image into the cluster.
-6. Deploy the application using Helm.
-7. Wait for the Kubernetes Deployment rollout to complete.
-8. Test the API endpoints using `curl`.
-
-The pipeline validates both the application and its Kubernetes deployment.
-
-### Why Does This Project Need CI/CD?
-
-CI/CD becomes increasingly important as the application evolves and new features are introduced.
-
-For example, future changes may include:
-
-- Adding new search parameters to the API.
-- Changing the character filtering logic.
-- Introducing new REST API endpoints.
-- Updating Python dependencies.
-- Modifying the Dockerfile or base image.
-- Changing Kubernetes resources or Helm configuration.
-- Integrating a database instead of CSV storage.
-
-Without CI/CD, these changes would require repeated manual testing and deployment. A developer could introduce a bug, break an existing endpoint, or deploy an incorrectly configured application without noticing.
-
-The automated pipeline helps prevent these issues by validating every relevant code change before it is considered ready.
-
-**CI/CD provides the following benefits:**
-
-- **Automated Testing** – Ensures that new features do not break existing functionality.
-- **Build Validation** – Verifies that the Docker image can be built successfully.
-- **Deployment Validation** – Checks that Kubernetes resources can be deployed correctly.
-- **API Validation** – Tests that the application endpoints respond as expected.
-- **Faster Development** – Allows developers to introduce changes with greater confidence.
-- **Reduced Human Errors** – Minimizes manual steps during testing and deployment.
-
-As the project grows, CI/CD provides a repeatable and reliable process for delivering new application versions.
+| Endpoint | Description |
+|---|---|
+| `/` | Main web interface |
+| `/characters` | Returns character data in JSON |
+| `/healthcheck` | Application health check |
 
 ## Project Structure
 
 ```text
-.
-├── .github/
-│   └── workflows/
-│       └── ci-cd.yaml
-├── helm/
-│   └── rick-and-morty/
-│       ├── templates/
-│       │   ├── deployment.yaml
-│       │   ├── service.yaml
-│       │   └── ingress.yaml
-│       ├── Chart.yaml
-│       └── values.yaml
-├── tests/
+rick-and-morty-devops/
+│
 ├── app.py
 ├── main.py
 ├── characters.csv
-├── Dockerfile
 ├── requirements.txt
 ├── requirements-dev.txt
+├── Dockerfile
+├── .dockerignore
 ├── .gitignore
-└── .dockerignore
+│
+├── templates/
+│   └── index.html
+│
+├── static/
+│   ├── style.css
+│   └── script.js
+│
+├── tests/
+│   ├── test_characters.py
+│   └── test_healthcheck.py
+│
+├── helm/
+│   └── rick-and-morty/
+│       ├── Chart.yaml
+│       ├── values.yaml
+│       └── templates/
+│
+├── yamls/
+│   └── yamls/
+│       ├── Deployment.yaml
+│       ├── Service.yaml
+│       └── Ingress.yaml
+│
+└── .github/
+    └── workflows/
+        └── ci-cd.yaml
 ```
 
-## Run Locally
+## Prerequisites
+
+Before running the project, make sure the following tools are installed:
+
+- Git
+- Python 3.12
+- Docker
+- kubectl
+- Minikube
+- Helm
+
+For the local Kubernetes deployment, Docker Desktop must be running if you are using the Docker driver.
+
+## Installation and Local Development
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/maxmaxim437-art/rick-and-morty-devops.git
+
+cd rick-and-morty-devops
+```
+
+### 2. Create a Python virtual environment
+
+```bash
+python3 -m venv .venv
+
+source .venv/bin/activate
+```
+
+On Windows PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+For development and testing:
 
 ```bash
 pip install -r requirements-dev.txt
+```
+
+### 4. Fetch character data
+
+```bash
 python main.py
+```
+
+This script retrieves character data from the Rick and Morty API and generates `characters.csv`.
+
+### 5. Run the application
+
+```bash
 python app.py
 ```
 
-API available at `http://localhost:5001`.
+Open:
 
-## Run Tests
+```text
+http://localhost:5001
+```
+
+### 6. Run tests
 
 ```bash
 python -m pytest -v
 ```
 
-## Technologies
+## Docker Deployment
 
-Python · Flask · REST API · Docker · Kubernetes · Helm · Kind · GitHub Actions · Pytest
+### 1. Build the Docker image
+
+```bash
+docker build -t rick-and-morty-api:1.0 .
+```
+
+### 2. Run the container
+
+```bash
+docker run -d \
+  --name rick-and-morty-api \
+  -p 5001:5001 \
+  rick-and-morty-api:1.0
+```
+
+Open:
+
+```text
+http://localhost:5001
+```
+
+To stop the container:
+
+```bash
+docker stop rick-and-morty-api
+```
+
+To remove it:
+
+```bash
+docker rm rick-and-morty-api
+```
+
+## Kubernetes Deployment with Minikube and Helm
+
+### 1. Start Minikube
+
+```bash
+minikube start --driver=docker
+```
+
+### 2. Build the Docker image
+
+```bash
+docker build -t rick-and-morty-api:1.0 .
+```
+
+### 3. Load the image into Minikube
+
+```bash
+minikube image load rick-and-morty-api:1.0
+```
+
+### 4. Deploy using Helm
+
+```bash
+helm upgrade --install my-rick-app ./helm/rick-and-morty
+```
+
+### 5. Verify the deployment
+
+```bash
+kubectl get pods
+kubectl get deployments
+kubectl get services
+kubectl get ingress
+```
+
+### 6. Check the application
+
+```bash
+kubectl rollout status deployment/my-rick-app-api
+```
+
+The application is configured with an NGINX Ingress resource.
+
+For local access, configure the Ingress hostname according to your local environment and make sure it resolves to the Minikube ingress endpoint.
+
+## Kubernetes Configuration
+
+The Helm chart manages the following resources and settings:
+
+- Deployment and replica configuration.
+- ClusterIP Service.
+- NGINX Ingress routing.
+- Readiness Probe using `/healthcheck`.
+- Liveness Probe using `/healthcheck`.
+- CPU and memory requests.
+- CPU and memory limits.
+- Configurable image repository and tag.
+
+Configuration is managed through `helm/rick-and-morty/values.yaml`.
+
+## CI/CD – GitHub Actions
+
+The GitHub Actions workflow is triggered by:
+
+- Push events to `main`.
+- Pull requests targeting `main`.
+
+The pipeline performs:
+
+1. Repository checkout.
+2. Python environment setup.
+3. Dependency installation.
+4. Automated test execution.
+5. Docker image build.
+6. Temporary Kubernetes cluster creation using Kind.
+7. Helm deployment.
+8. Kubernetes rollout validation.
+9. HTTP endpoint verification.
+
+The pipeline validates that the application can be built, deployed, and accessed inside a Kubernetes environment.
+
+## Health Checks
+
+The application exposes:
+
+```text
+GET /healthcheck
+```
+
+Expected response:
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+Kubernetes uses this endpoint for readiness and liveness probes.
+
+## Cleanup
+
+To remove the Helm deployment:
+
+```bash
+helm uninstall my-rick-app
+```
+
+To stop Minikube:
+
+```bash
+minikube stop
+```
+
+## Author
+
+**Maxim Gonik**
+
+DevOps Engineering Project
+
+---
+
+*This project was built as a hands-on demonstration of Python application development, Docker containerization, Kubernetes orchestration, Helm-based deployments, and CI/CD automation.*
